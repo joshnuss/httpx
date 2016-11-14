@@ -1,6 +1,6 @@
 # HTTPX
 
-**TODO: Add description**
+A tiny concurrent HTTP server
 
 ## Installation
 
