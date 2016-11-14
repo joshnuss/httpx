@@ -1,6 +1,6 @@
 # HTTPX
 
-A tiny concurrent HTTP server
+A tiny concurrent and fault-tolerant HTTP server.
 
 ## Installation
 
