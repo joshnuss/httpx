@@ -14,7 +14,7 @@ defmodule HTTPX.Server do
   defp loop(socket, app) do
     {:ok, client} = :gen_tcp.accept(socket)
 
-    Task.Supervisor.start_child(HTTPX.Connection.Supervisor, HTTPX.Connection, :serve, [client, app])
+    Task.Supervisor.start_child(HTTPX.Request.Supervisor, HTTPX.Request, :serve, [client, app])
 
     loop(socket, app)
   end
