@@ -1,6 +1,8 @@
 defmodule HTTPX.Server do
   require Logger
 
+  alias HTTPX.Request
+
   @options [:binary, packet: :line, active: false, reuseaddr: true]
 
   def start_link(port, app) do
@@ -14,7 +16,7 @@ defmodule HTTPX.Server do
   defp loop(socket, app) do
     {:ok, client} = :gen_tcp.accept(socket)
 
-    Task.Supervisor.start_child(HTTPX.Request.Supervisor, HTTPX.Request, :serve, [client, app])
+    Task.Supervisor.start_child(Request.Supervisor, Request, :serve, [client, app])
 
     loop(socket, app)
   end
