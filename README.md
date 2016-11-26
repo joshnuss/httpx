@@ -13,9 +13,9 @@ defmodule MyApp do
   def call(%{path: "/"}),
     do: %{code: 200, type: "text/plain", body: "OMG Y'ALL!!"}
 
-  # everything is a 404 response
+  # everything else is a 404 response
   def call(_),
-    do: %{code: 404, body: "oh dear, totally clueless"}
+    do: %{code: 404, body: "say what now?"}
 end
 ```
 
@@ -24,24 +24,3 @@ Then, start the server
 ```shell
 httpx myapp.exs --port 8080
 ```
-
-## Installation
-
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
-
-  1. Add `httpx` to your list of dependencies in `mix.exs`:
-
-    ```elixir
-    def deps do
-      [{:httpx, "~> 0.1.0"}]
-    end
-    ```
-
-  2. Ensure `httpx` is started before your application:
-
-    ```elixir
-    def application do
-      [applications: [:httpx]]
-    end
-    ```
-
