@@ -52,18 +52,18 @@ defmodule HTTPX.Request do
   defp process(request, handler) do
     Logger.info "#{request.verb} #{request.path}"
 
-    handler.(request)
+    handler.call(request)
   end
 
   defp write(response, socket) do
     preamble = """
     HTTP/1.1 #{response.code} #{message(response.code)}
     Date: #{:httpd_util.rfc1123_date}
-    Content-Type: #{response.content_type}
+    Content-Type: #{response[:type] || "text/plain"}
     Content-Length: #{String.length(response.body)}
     """
 
-    raw = preamble <> format_headers(response.headers) <> "\n\n" <> response.body
+    raw = preamble <> format_headers(response[:headers] || []) <> "\n\n" <> response.body
 
     :gen_tcp.send(socket, raw)
   end
