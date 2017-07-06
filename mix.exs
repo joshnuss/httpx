@@ -7,7 +7,12 @@ defmodule HTTPX.Mixfile do
      elixir: "~> 1.3",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
+     escript: escript(),
      deps: deps()]
+  end
+
+  def escript do
+    [main_module: HTTPX.CLI]
   end
 
   # Configuration for the OTP application
@@ -15,7 +20,7 @@ defmodule HTTPX.Mixfile do
   # Type "mix help compile.app" for more information
   def application do
     [applications: [:logger],
-     mod: {HTTPX, []}]
+     env: [name: :fake_web, port: 9000]]
   end
 
   # Dependencies can be Hex packages:
