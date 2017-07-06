@@ -25,3 +25,5 @@ Then, start the server
 ./httpx examples/myapp.exs --port 3000 &
 curl localhost:3000
 ```
+
+License: MIT
