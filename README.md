@@ -22,5 +22,6 @@ end
 Then, start the server
 
 ```shell
-httpx myapp.exs --port 8080
+./httpx examples/myapp.exs --port 3000 &
+curl localhost:3000
 ```
