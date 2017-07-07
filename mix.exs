@@ -20,7 +20,7 @@ defmodule HTTPX.Mixfile do
   # Type "mix help compile.app" for more information
   def application do
     [applications: [:logger],
-     env: [name: :fake_web, port: 9000]]
+     env: [port: 9000]]
   end
 
   # Dependencies can be Hex packages:
