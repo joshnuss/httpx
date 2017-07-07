@@ -6,12 +6,10 @@ defmodule HTTPX.CLI do
   end
 
   defp parse(args) do
-    {opts, _word, _} = OptionParser.parse(args, switches: [port: :integer, name: :string], aliases: [port: :p])
-
-    opts
+    OptionParser.parse(args, switches: [port: :integer], aliases: [port: :p])
   end
 
-  defp boot(opts) do
-    HTTPX.start(:transient, opts)
+  defp boot({opts, files, _}) do
+    HTTPX.start(:transient, {opts, files})
   end
 end
