@@ -56,20 +56,25 @@ defmodule HTTPX.Request do
   end
 
   defp write(response, socket) do
+    code = response[:code] || 500
+    body = response[:body] || ""
+    headers = format_headers(response[:headers])
+
     preamble = """
-    HTTP/1.1 #{response.code} #{message(response.code)}
+    HTTP/1.1 #{code} #{message(code)}
     Date: #{:httpd_util.rfc1123_date}
     Content-Type: #{response[:type] || "text/plain"}
-    Content-Length: #{String.length(response.body)}
+    Content-Length: #{String.length(body)}
     """
 
-    raw = preamble <> format_headers(response[:headers] || []) <> "\n\n" <> response.body
+    raw = preamble <> headers <> "\n" <> body
 
     :gen_tcp.send(socket, raw)
   end
 
+  defp format_headers(nil), do: ""
   defp format_headers(headers),
-    do: Enum.map_join(headers, "\n", &format_header/1)
+    do: Enum.map_join(headers, "\n", &format_header/1) <> "\n"
 
   defp format_header({key, value}),
     do: "#{key}: #{value}"
