@@ -1,38 +1,85 @@
 defmodule HTTPX.Server do
   require Logger
 
-  alias HTTPX.Request
+  @messages %{
+    200 => "OK",
+    404 => "Not Found",
+    500 => "Internal Error"
+  }
 
-  @options [:binary, packet: :line, active: false, reuseaddr: true]
+  def serve(client, handler) do
+    client
+    |> read
+    |> parse
+    |> process(handler)
+    |> write(client)
+  end
 
-  def child_spec(opts) do
+  defp read(socket) do
+    {:ok, line} = :gen_tcp.recv(socket, 0)
+    headers = read_headers(socket)
+
+    {line, headers}
+  end
+
+  defp parse({line, headers}) do
+    [verb, path, _version] = String.split(line)
+
+    {path, query} = parse_uri(path)
+
     %{
-      id: __MODULE__,
-      start: {__MODULE__, :start_link, [opts]},
-      type: :worker,
-      restart: :permanent,
-      shutdown: 500
+      verb: verb,
+      path: path,
+      query: query,
+      headers: headers
     }
   end
 
-  def start_link(opts) do
-    app = Keyword.fetch!(opts, :app)
-    port = Keyword.fetch!(opts, :port)
+  defp read_headers(socket, headers \\ []) do
+    {:ok, line} = :gen_tcp.recv(socket, 0)
 
-    {:ok, socket} = :gen_tcp.listen(port, @options)
-
-    Logger.info("Accepting connections on port #{port}")
-
-    pid = spawn fn -> loop(socket, app) end
-
-    {:ok, pid}
+    case Regex.run(~r/(\w+): (.*)/, line) do
+      [_line, key, value] -> [{key,  value}] ++ read_headers(socket, headers)
+      _                   -> []
+    end
   end
 
-  defp loop(socket, app) do
-    {:ok, client} = :gen_tcp.accept(socket)
-
-    Task.Supervisor.start_child(Request.Supervisor, Request, :serve, [client, app])
-
-    loop(socket, app)
+  defp parse_uri(path) do
+    case String.split(path, "?") do
+      [path] -> {path, []}
+      [path, query] -> {path, query}
+    end
   end
+
+  defp process(request, handler) do
+    Logger.info "#{request.verb} #{request.path}"
+
+    handler.call(request)
+  end
+
+  defp write(response, socket) do
+    code = response[:code] || 500
+    body = response[:body] || ""
+    headers = format_headers(response[:headers])
+
+    preamble = """
+    HTTP/1.1 #{code} #{message(code)}
+    Date: #{:httpd_util.rfc1123_date}
+    Content-Type: #{response[:type] || "text/plain"}
+    Content-Length: #{String.length(body)}
+    """
+
+    raw = preamble <> headers <> "\n" <> body
+
+    :gen_tcp.send(socket, raw)
+  end
+
+  defp format_headers(nil), do: ""
+  defp format_headers(headers),
+    do: Enum.map_join(headers, "\n", &format_header/1) <> "\n"
+
+  defp format_header({key, value}),
+    do: "#{key}: #{value}"
+
+  defp message(code), do: @messages[code] || "Unknown"
 end

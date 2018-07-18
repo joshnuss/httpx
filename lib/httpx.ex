@@ -8,8 +8,8 @@ defmodule HTTPX do
     app = HTTPX.CodeLoader.load(file)
 
     children = [
-      {Task.Supervisor, name: HTTPX.Request.Supervisor},
-      {HTTPX.Server, port: port, app: app}
+      {Task.Supervisor, name: HTTPX.Server.Supervisor},
+      {HTTPX.Listener, port: port, app: app}
     ]
 
     opts = [strategy: :one_for_one, name: HTTPX.Supervisor]
