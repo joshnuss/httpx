@@ -25,12 +25,14 @@ defmodule HTTPX.Request do
   defp parse({line, headers}) do
     [verb, path, _version] = String.split(line)
 
-    {path, query} = parse_path(path)
+    {path, query} = parse_uri(path)
 
-    %{verb: verb,
+    %{
+      verb: verb,
       path: path,
       query: query,
-      headers: headers}
+      headers: headers
+    }
   end
 
   defp read_headers(socket, headers \\ []) do
@@ -42,7 +44,7 @@ defmodule HTTPX.Request do
     end
   end
 
-  defp parse_path(path) do
+  defp parse_uri(path) do
     case String.split(path, "?") do
       [path] -> {path, []}
       [path, query] -> {path, query}

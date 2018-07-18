@@ -3,6 +3,9 @@ defmodule HTTPX.CLI do
     args
     |> parse
     |> boot
+
+
+    Process.sleep(:infinity)
   end
 
   defp parse(args) do

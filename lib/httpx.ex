@@ -5,12 +5,11 @@ defmodule HTTPX do
     import Supervisor.Spec, warn: false
 
     port = Keyword.get(opts, :port) || Application.get_env(:httpx, :port)
-
     app = HTTPX.CodeLoader.load(file)
 
     children = [
-      supervisor(Task.Supervisor, [[name: HTTPX.Request.Supervisor]]),
-      worker(HTTPX.Server, [port, app])
+      {Task.Supervisor, name: HTTPX.Request.Supervisor},
+      {HTTPX.Server, port: port, app: app}
     ]
 
     opts = [strategy: :one_for_one, name: HTTPX.Supervisor]
