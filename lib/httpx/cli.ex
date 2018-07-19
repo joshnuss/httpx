@@ -4,7 +4,6 @@ defmodule HTTPX.CLI do
     |> parse
     |> boot
 
-
     Process.sleep(:infinity)
   end
 
