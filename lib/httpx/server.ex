@@ -7,11 +7,11 @@ defmodule HTTPX.Server do
     500 => "Internal Error"
   }
 
-  def serve(client, handler) do
+  def serve(client, app) do
     client
     |> read
     |> parse
-    |> process(handler)
+    |> process(app)
     |> reply(client)
   end
 
@@ -51,10 +51,10 @@ defmodule HTTPX.Server do
     end
   end
 
-  defp process(request, handler) do
+  defp process(request, app) do
     Logger.info "#{request.verb} #{request.path}"
 
-    handler.call(request)
+    app.call(request)
   end
 
   defp reply(response, socket) do
