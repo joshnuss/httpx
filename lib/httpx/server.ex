@@ -12,7 +12,7 @@ defmodule HTTPX.Server do
     |> read
     |> parse
     |> process(handler)
-    |> write(client)
+    |> reply(client)
   end
 
   defp read(socket) do
@@ -57,7 +57,7 @@ defmodule HTTPX.Server do
     handler.call(request)
   end
 
-  defp write(response, socket) do
+  defp reply(response, socket) do
     code = response[:code] || 500
     body = response[:body] || ""
     headers = format_headers(response[:headers])
